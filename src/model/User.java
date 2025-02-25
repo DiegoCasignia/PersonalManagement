@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +21,10 @@ public class User {
         this.email = email;
         this.password = password;
         this.settings = settings;
+        this.contacts = new ArrayList<>();
+        this.tasks = new ArrayList<>();
+        this.notes = new ArrayList<>();
+        this.events = new ArrayList<>();
     }
 
     // Getters and Setters
