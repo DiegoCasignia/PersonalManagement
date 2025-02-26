@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,8 @@ public class Note {
         this.id = UUID.randomUUID().toString();
         this.title = title;
         this.content = content;
-        this.creationDate = new Date(); // Automatically set to current date
+        this.creationDate = new Date();
+        this.tags = new ArrayList<>();
     }
 
     // Getters and Setters

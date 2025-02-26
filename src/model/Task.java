@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,8 @@ public class Task {
         this.dueDate = dueDate;
         this.priority = priority;
         this.completed = completed;
+        this.tags = new ArrayList<>();
+        this.reminders = new ArrayList<>();
     }
 
     // Getters and Setters

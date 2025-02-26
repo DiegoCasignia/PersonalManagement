@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,8 @@ public class Event {
         this.endDate = endDate;
         this.location = location;
         this.reminderEnabled = reminderEnabled;
+        this.tags = new ArrayList<>();
+        this.reminders = new ArrayList<>();
     }
 
     // Getters and Setters

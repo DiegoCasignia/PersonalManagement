@@ -88,9 +88,10 @@ public class UserMenu {
     }
 
     private void viewContacts() {
+        System.out.println("\n=== LISTA DE CONTACTOS ===");
         List<Contact> contacts = user.getContacts();
-        if (contacts.isEmpty()) {
-            System.out.println("No tienes contactos guardados.");
+        if (contacts == null || contacts.isEmpty()) {
+            System.out.println("⚠️ No tienes contactos registrados.");
         } else {
             System.out.println("\n📞 Lista de Contactos:");
             for (Contact contact : contacts) {
@@ -113,9 +114,10 @@ public class UserMenu {
         String notes = scanner.nextLine();
 
         Contact contact = new Contact(name, phone, email, address, notes);
+        System.out.println(user.getName());
         user.addContact(contact);
         contactService.createContact(contact);
-        userService.createUser(user);
+        userService.updateUser(user);
 
         System.out.println("✅ Contacto agregado correctamente.");
     }
@@ -170,9 +172,10 @@ public class UserMenu {
     }
 
     private void viewNotes() {
+        System.out.println("\n=== LISTA DE NOTAS ===");
         List<Note> notes = user.getNotes();
-        if (notes.isEmpty()) {
-            System.out.println("No tienes notas guardadas.");
+        if (notes == null || notes.isEmpty()) {
+            System.out.println("⚠️ No tienes notas registradas.");
         } else {
             System.out.println("\n📝 Lista de Notas:");
             for (Note note : notes) {
