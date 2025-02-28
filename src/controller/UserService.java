@@ -47,7 +47,7 @@ public class UserService {
     }
 
     public void updateUser(User user) {
-        dbManager.save(user);
+        dbManager.update(user);
     }
 
     // Método para agregar un contacto a un usuario
@@ -59,8 +59,9 @@ public class UserService {
                 user.setContacts(new ArrayList<>());
             }
             user.addContact(contact);
-            dbManager.save(user);
+            dbManager.saveContact(user);
         } else {
+            System.out.println("Usuario no encontrado.");
             throw new IllegalArgumentException("Usuario no encontrado.");
         }
     }
@@ -74,7 +75,7 @@ public class UserService {
                 user.setTasks(new ArrayList<>());
             }
             user.addTask(task);
-            dbManager.save(user);
+            dbManager.saveTask(user);
         } else {
             throw new IllegalArgumentException("Usuario no encontrado.");
         }
@@ -89,7 +90,7 @@ public class UserService {
                 user.setNotes(new ArrayList<>());
             }
             user.addNote(note);
-            dbManager.save(user);
+            dbManager.saveNote(user);
         } else {
             throw new IllegalArgumentException("Usuario no encontrado.");
         }
@@ -104,7 +105,7 @@ public class UserService {
                 user.setEvents(new ArrayList<>());
             }
             user.addEvent(event);
-            dbManager.save(user);
+            dbManager.saveEvent(user);
         } else {
             throw new IllegalArgumentException("Usuario no encontrado.");
         }

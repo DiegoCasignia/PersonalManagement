@@ -5,11 +5,8 @@ import controller.ContactService;
 import controller.TaskService;
 import controller.NoteService;
 import controller.EventService;
-import model.User;
-import model.Contact;
-import model.Task;
-import model.Note;
-import model.Event;
+import model.*;
+
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -93,9 +90,14 @@ public class UserMenu {
         if (contacts == null || contacts.isEmpty()) {
             System.out.println("⚠️ No tienes contactos registrados.");
         } else {
-            System.out.println("\n📞 Lista de Contactos:");
-            for (Contact contact : contacts) {
-                System.out.println("- " + contact.getName() + " | " + contact.getPhone() + " | " + contact.getEmail());
+            for (int i = 0; i < contacts.size(); i++) {
+                Contact contact = contacts.get(i);
+                System.out.println((i + 1) + ". 📝 Nombre: " + contact.getName());
+                System.out.println("   📞 Teléfono: " + contact.getPhone());
+                System.out.println("   \uD83D\uDCE7 Correo: " + contact.getEmail());
+                System.out.println("   📍 Dirección: " + contact.getAddress());
+                System.out.println("   📌 Notas: " + contact.getNotes());
+                System.out.println("-----------------------------");
             }
         }
     }
@@ -114,10 +116,7 @@ public class UserMenu {
         String notes = scanner.nextLine();
 
         Contact contact = new Contact(name, phone, email, address, notes);
-        System.out.println(user.getName());
-        user.addContact(contact);
-        contactService.createContact(contact);
-        userService.updateUser(user);
+        userService.addContactToUser(user.getId(), contact);
 
         System.out.println("✅ Contacto agregado correctamente.");
     }
@@ -136,10 +135,22 @@ public class UserMenu {
 
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
-            System.out.println((i + 1) + ". " + task.getTitle());
+            System.out.println((i + 1) + ". 📝 Título: " + task.getTitle());
             System.out.println("   📌 Descripción: " + task.getDescription());
             System.out.println("   📅 Fecha: " + dateFormat.format(task.getDueDate()));
             System.out.println("   ✅ Estado: " + (task.isCompleted() ? "Completada" : "Pendiente"));
+            List<Tag> tags = task.getTags();
+            for (int j = 0; j < tags.size(); j++) {
+                Tag tag = tags.get(j);
+                System.out.println("   \uD83D\uDD34 Etiqueta: " + tag.getName());
+            }
+            List<Reminder> reminders = task.getReminders();
+            for (int j = 0; j < reminders.size(); j++) {
+                Reminder reminder = reminders.get(j);
+                System.out.println("   ⏰ Recordatorio: " + reminder.getMessage());
+                System.out.println("   \uD83D\uDCC5 Fecha de Recordatorio: " + dateFormat.format(reminder.getDateTime()));
+                System.out.println("   ✅ Repetir recordatorio: " + (task.isCompleted() ? "Si" : "No"));
+            }
             System.out.println("-----------------------------");
         }
     }
@@ -151,22 +162,37 @@ public class UserMenu {
         System.out.print("Descripción: ");
         String description = scanner.nextLine();
         System.out.print("Fecha (YYYY-MM-DD): ");
-        String dateString = scanner.nextLine();
+        String dateString1 = scanner.nextLine();
         System.out.print("Estado (true = completada, false = pendiente): ");
         boolean completed = scanner.nextBoolean();
         scanner.nextLine();
+        System.out.print("Etiquieta: ");
+        String nameTag = scanner.nextLine();
+        System.out.print("Color: ");
+        String colorTag = scanner.nextLine();
+        System.out.print("Fecha de recordatorio (YYYY-MM-DD): ");
+        String dateString2 = scanner.nextLine();
+        System.out.print("Mensaje de recordatorio: ");
+        String messageReminder = scanner.nextLine();
+        System.out.print("Repetir recordatorio (true = Si, false = No): ");
+        boolean repeatReminder = scanner.nextBoolean();
+        scanner.nextLine();
 
-        Date date = new Date();
+        Date date1 = new Date();
+        Date date2 = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
         try {
-            date = dateFormat.parse(dateString);
+            date1 = dateFormat.parse(dateString1);
+            date2 = dateFormat.parse(dateString2);
         } catch (ParseException e) { }
 
-        Task task = new Task(title, description, date, 1,completed);
-        user.addTask(task);
-        taskService.createTask(task);
-        userService.updateUser(user);
+        Task task = new Task(title, description, date1, 1,completed);
+        Tag tag = new Tag(nameTag, colorTag);
+        Reminder reminder = new Reminder(messageReminder, date2, repeatReminder);
+        task.addReminder(reminder);
+        task.addTag(tag);
+        userService.addTaskToUser(user.getId(), task);
 
         System.out.println("✅ Tarea agregada correctamente.");
     }
@@ -176,11 +202,22 @@ public class UserMenu {
         List<Note> notes = user.getNotes();
         if (notes == null || notes.isEmpty()) {
             System.out.println("⚠️ No tienes notas registradas.");
-        } else {
-            System.out.println("\n📝 Lista de Notas:");
-            for (Note note : notes) {
-                System.out.println("- " + note.getTitle() + ": " + note.getContent());
+            return;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (int i = 0; i < notes.size(); i++) {
+            Note note = notes.get(i);
+            System.out.println((i + 1) + ". 📝 Título: " + note.getTitle());
+            System.out.println("   📌 Contenido: " + note.getContent());
+            System.out.println("   📅 Fecha: " + dateFormat.format(note.getCreationDate()));
+            List<Tag> tags = note.getTags();
+            for (int j = 0; j < tags.size(); j++) {
+                Tag tag = tags.get(j);
+                System.out.println("   \uD83D\uDD34 Etiqueta: " + tag.getName());
             }
+            System.out.println("-----------------------------");
         }
     }
 
@@ -190,11 +227,15 @@ public class UserMenu {
         String title = scanner.nextLine();
         System.out.print("Contenido: ");
         String content = scanner.nextLine();
+        System.out.print("Etiquieta: ");
+        String nameTag = scanner.nextLine();
+        System.out.print("Color: ");
+        String colorTag = scanner.nextLine();
 
         Note note = new Note(title, content);
-        user.addNote(note);
-        noteService.createNote(note);
-        userService.updateUser(user);
+        Tag tag = new Tag(nameTag, colorTag);
+        note.addTag(tag);
+        userService.addNoteToUser(user.getId(), note);
 
         System.out.println("✅ Nota agregada correctamente.");
     }
@@ -213,12 +254,24 @@ public class UserMenu {
 
         for (int i = 0; i < events.size(); i++) {
             Event event = events.get(i);
-            System.out.println((i + 1) + ". " + event.getTitle());
+            System.out.println((i + 1) + ". 📝 Título: " + event.getTitle());
             System.out.println("   📝 Descripción: " + event.getDescription());
             System.out.println("   📅 Fecha Inicio: " + dateFormat.format(event.getStartDate()));
             System.out.println("   📅 Fecha Fin: " + dateFormat.format(event.getEndDate()));
             System.out.println("   📍 Lugar: " + event.getLocation());
             System.out.println("   🔔 Recordatorio: " + (event.isReminderEnabled() ? "Sí" : "No"));
+            List<Tag> tags = event.getTags();
+            for (int j = 0; j < tags.size(); j++) {
+                Tag tag = tags.get(j);
+                System.out.println("   \uD83D\uDD34 Etiqueta: " + tag.getName());
+            }
+            List<Reminder> reminders = event.getReminders();
+            for (int j = 0; j < reminders.size(); j++) {
+                Reminder reminder = reminders.get(j);
+                System.out.println("   ⏰ Recordatorio: " + reminder.getMessage());
+                System.out.println("   \uD83D\uDCC5 Fecha de Recordatorio: " + dateFormat.format(reminder.getDateTime()));
+                System.out.println("   ✅ Repetir recordatorio: " + (reminder.isRepeat() ? "Si" : "No"));
+            }
             System.out.println("-----------------------------");
         }
     }
@@ -237,20 +290,34 @@ public class UserMenu {
         String location = scanner.nextLine();
         System.out.print("Recordatorio (true = habilitar, false = deshabilitar): ");
         boolean completed = scanner.nextBoolean();
+        scanner.nextLine();
+        System.out.print("Etiquieta: ");
+        String nameTag = scanner.nextLine();
+        System.out.print("Color: ");
+        String colorTag = scanner.nextLine();
+        System.out.print("Fecha de recordatorio (YYYY-MM-DD): ");
+        String dateString2 = scanner.nextLine();
+        System.out.print("Repetir recordatorio (true = completada, false = pendiente): ");
+        boolean repeatReminder = scanner.nextBoolean();
+        scanner.nextLine();
 
         Date startDate = new Date();
         Date endDate = new Date();
+        Date date2 = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
         try {
             startDate = dateFormat.parse(startDateString);
             endDate = dateFormat.parse(endDateString);
+            date2 = dateFormat.parse(dateString2);
         } catch (ParseException e) { }
 
         Event event = new Event(title, description, startDate, endDate, location, completed);
-        user.addEvent(event);
-        eventService.createEvent(event);
-        userService.updateUser(user);
+        Tag tag = new Tag(nameTag, colorTag);
+        Reminder reminder = new Reminder(title, date2, repeatReminder);
+        event.addReminder(reminder);
+        event.addTag(tag);
+        userService.addEventToUser(user.getId(), event);
 
         System.out.println("✅ Evento agregado correctamente.");
     }

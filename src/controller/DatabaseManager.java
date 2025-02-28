@@ -1,5 +1,6 @@
 package controller;
 
+import model.User;
 import com.db4o.*;
 import com.db4o.query.Predicate;
 import java.io.File;
@@ -36,10 +37,77 @@ public class DatabaseManager {
             db.store(obj);
             db.commit();
         } catch (Exception e) {
-            db.rollback();
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
             e.printStackTrace();
+            db.rollback();
         }
     }
+
+    public void saveContact(User user) {
+        try {
+            db.store(user.getContacts());
+            db.store(user);
+            db.commit();
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
+            e.printStackTrace();
+            db.rollback();
+        }
+    }
+
+    public void saveTask(User user) {
+        try {
+            db.store(user.getTasks());
+            db.store(user);
+            db.commit();
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
+            e.printStackTrace();
+            db.rollback();
+        }
+    }
+
+    public void saveNote(User user) {
+        try {
+            db.store(user.getNotes());
+            db.store(user);
+            db.commit();
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
+            e.printStackTrace();
+            db.rollback();
+        }
+    }
+
+    public void saveEvent(User user) {
+        try {
+            db.store(user.getEvents());
+            db.store(user);
+            db.commit();
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
+            e.printStackTrace();
+            db.rollback();
+        }
+    }
+
+    public void update(Object obj) {
+        try {
+            ObjectSet<Object> result = db.queryByExample(obj);
+            if (!result.isEmpty()) {
+                Object storedObject = result.next();
+                db.store(storedObject);
+                db.commit();
+            } else {
+                System.out.println("⚠️ Objeto no encontrado en la base de datos.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error al guardar en DB4O: " + e.getMessage());
+            e.printStackTrace();
+            db.rollback();
+        }
+    }
+
 
     public void delete(Object obj) {
         try {

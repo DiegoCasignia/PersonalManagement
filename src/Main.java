@@ -2,7 +2,6 @@ import controller.UserService;
 import model.User;
 import model.UserSettings;
 import view.UserMenu;
-
 import java.util.List;
 import java.util.Scanner;
 import java.util.Optional;
@@ -34,7 +33,7 @@ public class Main {
                     List<User> users = userService.getAllUsers();
                     System.out.println("\n=== USUARIOS REGISTRADOS ===");
                     for (User user : users) {
-                        System.out.println("ID: " + user.getId() + ", Nombre: " + user.getName() + ", Email: " + user.getEmail());
+                        System.out.println("Nombre: " + user.getName() + ", Email: " + user.getEmail());
                     }
                     break;
                 case 4:
